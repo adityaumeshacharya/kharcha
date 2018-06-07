@@ -1,0 +1,35 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+ul.success li{
+	padding: 15px;
+	margin-bottom: 20px;
+	border: 1px solid transparent;
+	border-radius: 4px,
+	color: #3c763d;
+	background-color:#d6e9c6;
+	list-style: none;
+}
+ul.error li{
+	padding: 15px;
+	margin-bottom: 20px;
+	border: 1px solid transparent;
+	border-radius: 4px,
+	color: #a94442;
+	background-color:#ebccd1;
+	list-style: none;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th{
+	text-align: center;
+}

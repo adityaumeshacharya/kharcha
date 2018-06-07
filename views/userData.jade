@@ -1,0 +1,23 @@
+extends layout
+block content
+	h2 Total Available Balance is : #{totalAmount} Rs.
+	div
+		table.table.table-hover.tablesorter
+			thread
+				tr 
+					th Date
+					th Description          
+					th Type of Transaction
+					th Amount
+					th Delete Entry
+			tbody
+				each data in Data
+					tr
+						td  #{data.date}
+						td  #{data.description}
+						td  #{data.typeOftransaction}
+						td  #{data.amount}
+						td
+							span
+								form(method='POST', action='/users/userData/#{data._id}/delete')
+									button.btn.btn-primary.btn-xs(type='submit') Delete

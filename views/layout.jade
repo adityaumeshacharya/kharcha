@@ -1,0 +1,41 @@
+doctype html
+html
+	head
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		title= title
+		link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+	body
+		.navbar.navbar-default(role='navigation')
+			.container
+				.navbar-header
+					button.navbar-toggle(type='button',data-toggle='collapse',data-target='.navbar-collapse')
+						span.sr-only Toggle navigation
+						span.icon-bar
+						span.icon-bar
+						span.icon-bar
+					a.navbar-brand(href='#') Kharcha
+				.navbar-collapse.collapse
+					ul.nav.navbar-nav
+						if user
+							li(class=(title == 'Members' ? 'active' : ''))
+								a(href='/') Home
+							li(class=(title == 'Data' ? 'active' : ''))
+								a(href='/users/userData') Data
+						if !user
+							li(class=(title == 'Register' ? 'active' : ''))
+								a(href='/users/register') Register
+							li(class=(title == 'Login' ? 'active' : ''))
+								a(href='/users/login') Login
+
+					ul.nav.navbar-nav.navbar-right
+						if user
+							li
+								a(href='/users/logout') Logout
+		.container
+			!= messages()
+
+			block content
+
+		script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+		script(src='/javascripts/bootstrap.js')
