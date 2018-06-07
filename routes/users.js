@@ -9,8 +9,9 @@ var passport = require('passport');
 var localStrategy = require('passport-local').Strategy;
 var methodOverride = require('method-override');
 var app=express();
+
+
 app.use(methodOverride('_method'));
-app.locals.moment = require('moment');
 var currentCustId;
 var query = {custId:''};
 var Data =[]; 
@@ -36,7 +37,6 @@ router.get('/userData',ensureAuthenticated,(req,res)=>{
         console.log("current custId from get"+currentCustId);
         if(err) throw err;
         Data = result;
-        console.log("Your Data is "+Data);
         for (var index in Data) {
             if (Data[index].typeOftransaction == "1") {
                 totalAmount += Data[index].amount;
@@ -200,11 +200,6 @@ router.post('/members', function(req, res, next) {
     var description = req.body.description;
     var typeOftransaction = req.body.typeOftransaction;
     var amount = req.body.amount;
-
-    console.log("name is:" + date);
-    console.log("email is:" + description);
-    console.log("tot is:" + typeOftransaction);
-    console.log("password is:" + amount);
     var newData = new data({
             date: date,
             description: description,

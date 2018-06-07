@@ -4,13 +4,14 @@ var data = require('../model/data');
 var user = require('../routes/users');
 var app=express();
 var moment = require('moment');
-var date = require('datejs');
-var todaysDate = new Date();
+var date = "Wed Jun 06 2018 05:30:00 GMT+0530 (IST)	";
+var date = moment(date).format("MMM Do YY");
 // Date.parse(todaysDate).toString("dd/mm/yyyy");
-var date=todaysDate.getDate();
+
+console.log("Date from index.js: "+date)
 
 /* GET home page. */
-console.log("From index.js "+user.currentCustId);
+
 router.get('/', ensureAuthenticated,function(req, res, next) {
   res.render('index', { title: 'Members'});
 });

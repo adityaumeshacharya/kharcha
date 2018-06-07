@@ -33,3 +33,8 @@ table, th, td {
 th{
 	text-align: center;
 }
+
+.navbar-brand{
+	float: left;
+	margin-right: 50px;
+}
