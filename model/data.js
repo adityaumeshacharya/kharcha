@@ -22,6 +22,12 @@ var dataSchema = mongoose.Schema({
 	},
 	userId:{
 		type: String
+	},
+	iOwe:{
+		type: String
+	},
+	whoOwesMe:{
+		type: String
 	}
 });
 

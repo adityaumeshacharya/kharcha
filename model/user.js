@@ -1,3 +1,4 @@
+var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs');
 
@@ -21,6 +22,12 @@ var userSchema = mongoose.Schema({
 		type: String
 	},
 	profileimage:{
+		type:String
+	},
+	iOwe:{
+		type:String
+	},
+	whoOwesMe:{
 		type:String
 	}
 });
@@ -52,4 +59,9 @@ module.exports.createUser = (newUser,callback)=>{
 
 		});
 	});
-	}
+}
+
+module.exports.getUserNames = (callback)=>{
+	user.find({},(callback)).sort({"username":1});
+	
+}

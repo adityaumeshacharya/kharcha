@@ -22,6 +22,8 @@ html
 								a(href='/') Home
 							li(class=(title == 'Data' ? 'active' : ''))
 								a(href='/users/userData') Data
+							li(class=(title == 'Share' ? 'active' : ''))
+								a(href='/users/shared') Share
 						if !user
 							li(class=(title == 'Register' ? 'active' : ''))
 								a(href='/users/register') Register

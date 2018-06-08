@@ -38,3 +38,8 @@ th{
 	float: left;
 	margin-right: 50px;
 }
+
+.round-corner{
+	border: 1px solid;
+	border-radius: 10px;
+}
