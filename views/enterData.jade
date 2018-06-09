@@ -1,0 +1,20 @@
+extends layout
+block content
+    h1 Welcome
+    form(method= 'post', action='/users/enterData')
+        .form-group
+            input.form-control.round-corner(name='date' type='date' model='date')
+
+        .form-group
+            input.form-control.round-corner(name='description' type='text' model='description' placeholder='Description')
+
+        .form-group
+            select.form-control.round-corner(name='typeOftransaction', id='typeOftransaction')
+                option(value='0') -- Select type of transaction --
+                option(value='1') Credit
+                option(value='2') Debit
+
+        .form-group
+            input.form-control.round-corner(name='amount' type='number' model='amount' placeholder='Amount')
+
+        input.btn.btn-primary(type='submit',name='submit',value='Add Transaction')

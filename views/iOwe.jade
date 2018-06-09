@@ -1,0 +1,23 @@
+extends layout
+block content
+	h2 Total Amount You Owe is : #{totalAmount} Rs.
+	div
+		table.table.table-hover.tablesorter
+			thread
+				tr 
+					th Date
+					th Description          
+					th Amount
+					th To Whom
+					th
+			tbody
+				each data in Data
+					tr
+						td  #{data.date}
+						td  #{data.description}
+						td  #{data.amount}
+						td  #{data.uploaderName}
+						td
+							span
+								form(method='POST', action='/users/iOwe/#{data._id}/pay')
+									button.btn.btn-primary.btn-xs(type='submit') Pay

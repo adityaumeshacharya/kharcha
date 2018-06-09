@@ -24,6 +24,10 @@ html
 								a(href='/users/userData') Data
 							li(class=(title == 'Share' ? 'active' : ''))
 								a(href='/users/shared') Share
+							li(class=(title == 'iOwe' ? 'active' : ''))
+								a(href='/users/iOwe') I Owe
+							li(class=(title == 'whoOwesMe' ? 'active' : ''))
+								a(href='/users/whoOwesMe') Who Owes Me
 						if !user
 							li(class=(title == 'Register' ? 'active' : ''))
 								a(href='/users/register') Register

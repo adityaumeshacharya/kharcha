@@ -23,12 +23,6 @@ var userSchema = mongoose.Schema({
 	},
 	profileimage:{
 		type:String
-	},
-	iOwe:{
-		type:String
-	},
-	whoOwesMe:{
-		type:String
 	}
 });
 

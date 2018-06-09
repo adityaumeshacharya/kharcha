@@ -11,16 +11,28 @@ var passport = require('passport');
 var localStrategy = require('passport-local').Strategy;
 var methodOverride = require('method-override');
 var app=express();
-
+var sharingId = 1;
 
 app.use(methodOverride('_method'));
 var currentCustId;
+var uploaderName;
 var query = {custId:''};
 var Data =[]; 
 var totalAmount = 0.0;
 router.get('/', function(req, res, next) {
     res.render('respond with a resource');
 });
+
+function move() {
+    console.log("in move function");
+            router.get('/enterData',(req,res)=>{
+            res.render('enterData', { title: 'Enter Data' });
+            });
+        }
+
+
+
+
 function ensureAuthenticated(req, res, next){
     if(req.isAuthenticated()){
         return next();
@@ -114,7 +126,8 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/users/
 });
 
 passport.serializeUser(function(userObj, done) {
-    console.log("In serializeUser "+userObj);
+    uploaderName = userObj.username;
+    console.log("In serializeUser "+uploaderName);
     done(null, userObj.id);   
 });
 passport.deserializeUser(function(id, done) {
@@ -251,51 +264,195 @@ router.post('/loginShared', passport.authenticate('local', { failureRedirect: '/
     req.flash('success', 'Login Successful');
     res.redirect('/users/indexShared');
 });
-
-
+var shareUserDetails=[];
 router.get('/shared',(req,res,next)=>{
     var users = [];
     user.getUserNames((err,result)=>{
         if (err) throw err;
         users = result;
-        res.render('sharedPage',{title: 'Shared Section', users:users});
+        for(var index=0; index< users.length; index++){
+            if(currentCustId == users[index]._id){
+                users.splice(index,1);
+            }
+        }
+        // for(var i in shareUserDetails){
+        //     for(var j in users){
+        //         if(shareUserDetails[i]._id == users[j]._id){
+        //             users.splice(j,1);
+        //         }
+        //     }
+        // }
+        res.render('sharedPage',{title: 'Shared Section', users:users, shareUserDetails: shareUserDetails});
     });
     
 });
-
 router.post('/shared', (req, res, next) => {
-    var shareUserDetails = [];
+    console.log("in post/shared");
+    var sharerDetails = [];
     var shareWith = req.body.shareWith;
-    user.getUserByUsername(shareWith, (err, userObj) => {
+    var submit = req.body.submit;
+    if (submit == 'Add') {
+        user.getUserByUsername(shareWith, (err, userObj) => {
+            if (err) throw err;
+            shareUserDetails.push(userObj);
+            console.log("shareUserDetails:  " + shareUserDetails);
+            res.redirect('/users/shared');
+        });
+    }
+
+    if (submit == 'Submit and Proceed') {
+        var userId = [];
+        for (var index in shareUserDetails) {
+            userId.push(shareUserDetails[index]._id);
+        }
+        var newIdAndName = new idAndName({
+            uploader: currentCustId,
+            sharingWith: userId,
+            accepted: false
+        });
+        idAndName.createData(newIdAndName, (err, data) => {
+            if (err) throw err;
+        });
+        req.flash('success', 'Data Entered!!')
+        res.redirect('/users/enterData');
+    }
+});
+
+router.get('/enterData',(req,res)=>{
+    res.render('enterData', { title: 'Enter Data' });
+});
+
+router.post('/enterData',(req,res,next)=>{
+    var myId;
+    var byWhomName;
+    var date = req.body.date;
+    var description = req.body.description;
+    var typeOftransaction = req.body.typeOftransaction;
+    var totalAmount = req.body.amount;
+    var amount = totalAmount / (shareUserDetails.length + 1);
+    console.log("Amount is: "+amount);
+    for(var i in shareUserDetails){
+        myId = shareUserDetails[i]._id;
+        byWhomName = shareUserDetails[i].username
+        console.log("myId is : " + myId);
+        var newData = new shared({
+            myId: myId,
+            date: date,
+            description: description,
+            amount: amount,
+            uploader: currentCustId,
+            uploaderName: uploaderName,
+            byWhomName: byWhomName,
+            paid: false
+        });
+        console.log("new Data is: "+newData);
+        shared.createData(newData,(err,data)=>{
+            if(err) throw err;
+        });
+    }
+    var description = req.body.description + ' (in Shared)';
+    var newData = new data({
+            date: date,
+            description: description,
+            typeOftransaction: typeOftransaction,
+            amount: totalAmount,
+            userId: currentCustId
+        });
+    console.log("The newly entered data is: "+newData);
+    data.createData(newData, (err, data) => {
         if (err) throw err;
-        shareUserDetails = userObj;
-        var date = req.body.date;
-        var description = req.body.description;
-        var typeOftransaction = req.body.typeOftransaction;
-        var amount = req.body.amount;
-        var newShare = new shared ({
+    });
+
+    req.flash('success', 'Data Entered!!')
+    res.redirect('/users/enterData');
+});
+
+
+router.get('/iOwe',(req,res,next)=>{
+    var totalAmount = 0.0;
+    var Data =[];
+    shared.getDataForIOwe(currentCustId,(err,result)=>{
+        if(err) throw err;
+        Data = result;
+        console.log("hiii.. from router.get iOwe: "+Data);
+        for (var index in Data) {
+            totalAmount += Data[index].amount;
+        }
+
+        res.render('iOwe',{title: 'iOwe', Data:Data, totalAmount:totalAmount });
+    });
+});
+
+router.post('/iOwe/:id/pay', (req, res) => {
+    var toPay = req.params.id;
+    console.log("payingFrom: " + toPay);
+    var Data = [];
+    shared.getDataByIdForIOwe(toPay, (err, result) => {
+        if (err) throw err;
+        Data = result;
+        console.log("Paid!!!" + Data);
+        shared.updateData(toPay, (err, resp) => {
+            if (err) throw err;
+        })
+        var date = new Date;
+        var description = 'Paid for shared to ' + Data[0].uploaderName;
+        var typeOftransaction = '2';
+        var amount = Data[0].amount;
+        console.log("amount from /iOwe/:id/pay : "+amount)
+        var newData = new data({
             date: date,
             description: description,
             typeOftransaction: typeOftransaction,
             amount: amount,
-            uploader: currentCustId,
-            sharer: shareUserDetails._id
+            userId: currentCustId
+        });
+        data.createData(newData, (err, data) => {
+            if (err) throw err;
+        });
 
+        var newData = new data({
+            date: date,
+            description: 'Received for shared payment from ' + Data[0].byWhomName,
+            typeOftransaction: '1',
+            amount: amount,
+            userId: Data[0].uploader
         });
-        shared.createData(newShare, (err, data) => {
+        data.createData(newData, (err, data) => {
             if (err) throw err;
         });
-        var newIdAndName = new idAndName({
-            uploader: currentCustId,
-            sharingWith: shareUserDetails._id
-        });
-        idAndName.createData(newIdAndName,(err,data)=>{
-            if (err) throw err;
-        });
-        req.flash('success', 'Data Entered!!')
-        res.redirect('/users/shared');
+        res.redirect('/users/iOwe');
+    });
+
+});
+
+
+
+
+
+
+
+
+
+
+
+router.get('/whoOwesMe',(req,res,next)=>{
+    var totalAmount = 0.0;
+    var Data =[];
+    shared.getDataForwhoOweMe(currentCustId,(err,result)=>{
+        if(err) throw err;
+        Data = result;
+        console.log("hiii.. from router.get whoOwesMe: "+Data);
+        for (var index in Data) {
+            totalAmount += Data[index].amount;
+        }
+
+        res.render('whoOwesMe',{title: 'whoOwesMe', Data:Data, totalAmount:totalAmount });
     });
 });
+
+
+
+
 
 currentUserId = module.exports;
 module.exports = router;
